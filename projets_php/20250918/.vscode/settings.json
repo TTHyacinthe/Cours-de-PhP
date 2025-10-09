@@ -1,0 +1,10 @@
+"editor.tokenColorCustomizations": {
+    "comments": "#6A9955",       // Couleur des commentaires
+    "keywords": "#569CD6",       // Couleur des mots-clés (if, else, etc.)
+    "strings": "#CE9178",        // Couleur des chaînes de caractères
+    "numbers": "#B5CEA8"         // Couleur des nombres
+},
+"workbench.colorCustomizations": {
+    "editor.background": "#1E1E1E",   // Couleur de fond
+    "editor.foreground": "#D4D4D4"    // Couleur du texte par défaut
+}
