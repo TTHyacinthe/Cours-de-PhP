@@ -9,7 +9,7 @@ try {
      * connect to the database sqlite
      */
 $pdo = new PDO('sqlite:db.sqlite');
-$sql = "select * from tasks order by completed asc";
+$sql = "SELECT * from tasks order by id desc, completed asc";
 $stmt = $pdo->prepare($sql); // stmt = statement
 $stmt->execute();
 $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetchAll = récupérer toutes les lignes
@@ -38,20 +38,22 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetchAll = récupérer toutes les
 <div class="overflow-x-auto w-3/4"> 
 
      <!-- Menu déroulant offrant la possibilité de choisir le théme de la page -->
-                <!-- <select id="theme-select" class="select select-bordered w-full max-w-xs">
+                 <select id="theme-select" class="select select-bordered w-full max-w-xs">
                     <option disabled selected>Choisir un thème</option>
                     <option value="light">Light</option>
                     <option value="dark">Dark</option>
                     <option value="cupcake">Cupcake</option>
                     <option value="corporate">Corporate</option>
                     <option value="dracula">Dracula</option>
-                </select> -->
-                 <!-- <script>
+                </select>
+                 <script>
                     document.getElementById('theme-select').addEventListener('change', (e) => {
                     document.documentElement.setAttribute('data-theme', e.target.value);
                     });
-                </script> -->
-  <button class="btn btn-outline btn-info">New task</button>
+                </script> 
+  <a href="create.php" class="btn btn-outline w-1/2"> New task</a>
+
+  <!-- <button class="btn btn-outline btn-info">New task</button> -->
   <table class="table table-zebra w-full">
     <thead>
       <tr>
@@ -69,16 +71,21 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetchAll = récupérer toutes les
     <tbody>
       <?php foreach ($tasks as $task): ?>
       <?php $date = DateTime::createFromFormat('Y-m-d H:i:s', $task['created_at']); ?>
+      <?php $date_due = DateTime::createFromFormat('Y-m-d', $task['due_date']); ?>
         <tr>
           <td><?= htmlspecialchars($task['id']) ?></td>
           <td><?= htmlspecialchars($task['title']) ?></td>
           <td><?= htmlspecialchars($task['description'] ?? '') ?></td>
-          <td><?= htmlspecialchars($task['completed'] ?? '') ?></td>
+          <td><a href="complete.php?task=<?php echo $task['id'] ?>" role="button">
+              <?= $task['completed'] ?> 
+              </a></td>
           <td><?= htmlspecialchars($task['priority'] ?? '') ?></td>
           <td><?= htmlspecialchars($task['category'] ?? '') ?></td>
-          <td><?= htmlspecialchars($task['due_date'] ?? '') ?></td>
+          <td><?= $date_due->format('d-m-Y') ?></td>
           <td><?= $date->format ('d-m-Y') ?></td>
-          <td>X</td>
+          <td>
+            <a href="delete.php?task=<?php echo $task['id'] ?>" role="button"  class="btn btn-sm btn-error">Supprimer</a>
+          </td>
         </tr>
       <?php endforeach; ?>
     </tbody>
