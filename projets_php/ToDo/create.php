@@ -9,7 +9,19 @@
 </head>
 
 <body class="min-h-screen bg-base-200 flex items-center justify-center p-6">
-
+                <select id="theme-select" class="select select-bordered w-full max-w-xs">
+                    <option disabled selected>Choisir un thème</option>
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="cupcake">Cupcake</option>
+                    <option value="corporate">Corporate</option>
+                    <option value="dracula">Dracula</option>
+                </select>
+                 <script>
+                    document.getElementById('theme-select').addEventListener('change', (e) => {
+                    document.documentElement.setAttribute('data-theme', e.target.value);
+                    });
+                </script> 
   <div class="card w-full max-w-lg bg-base-100 shadow-2xl">
     <div class="card-body">
       <h2 class="text-2xl font-bold text-primary text-center mb-4">Ajouter une tâche</h2>

@@ -85,6 +85,8 @@ $tasks = $stmt->fetchAll(PDO::FETCH_ASSOC); // fetchAll = récupérer toutes les
           <td><?= $date->format ('d-m-Y') ?></td>
           <td>
             <a href="delete.php?task=<?php echo $task['id'] ?>" role="button"  class="btn btn-sm btn-error">Supprimer</a>
+            <a href="edit.php?task=<?php echo $task['id'] ?>" role="button"  class="btn btn-sm btn-success">Modifier</a>
+
           </td>
         </tr>
       <?php endforeach; ?>
