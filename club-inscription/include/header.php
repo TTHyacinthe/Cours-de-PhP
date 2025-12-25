@@ -69,7 +69,7 @@ $currentTheme = $_SESSION['theme'] ?? 'corporate';
 
 <div class="navbar bg-base-100 shadow-md px-6">
     <div class="flex-1">
-        <a href = "/"
+        <a href = "/public/index.php"
             class="text-x1 font-bold flex items-center gap-2 hoover:text-primary transition">
                 🏁 Chrono App
         </a>
