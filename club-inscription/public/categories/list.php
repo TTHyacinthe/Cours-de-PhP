@@ -8,12 +8,18 @@ $flash = $_SESSION['flash'] ?? null;
 unset($_SESSION['flash']);
 
 $stmt = $db->query("
-  SELECT c.id, c.nom,
-         (SELECT COUNT(*) FROM participants p WHERE p.categorie_id = c.id) AS participants
+  SELECT c.id, c.cle, c.nom,
+         (
+           SELECT COUNT(*)
+           FROM participants p
+           WHERE p.categorie_id = c.id
+         ) AS participants
   FROM categories c
   ORDER BY c.nom COLLATE NOCASE
 ");
+
 $categories = $stmt->fetchAll();
+
 ?>
 
 <div class="card bg-base-100 shadow-lg border border-base-300 p-8">

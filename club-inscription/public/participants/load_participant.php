@@ -60,7 +60,7 @@ $cats = $db->query("SELECT id, nom FROM categories ORDER BY nom ASC")->fetchAll(
                 </option>
             <?php endforeach; ?>
         </select>
-                        </div>
+     </div>
 
     <div>
         <label class="font-semibold">Club</label>

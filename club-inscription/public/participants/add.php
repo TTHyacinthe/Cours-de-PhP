@@ -45,39 +45,35 @@ unset($_SESSION["old"]);
             <label class="label"><span class="label-text font-semibold">Genre *</span></label>
 
             <div class="flex gap-6">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="genre" value="H"
-                           <?= (isset($old['genre']) && $old['genre'] === "H") ? "checked" : "" ?>
-                           class="radio radio-primary">
-                    Homme
-                </label>
-
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="genre" value="F"
-                           <?= (isset($old['genre']) && $old['genre'] === "F") ? "checked" : "" ?>
-                           class="radio radio-primary">
-                    Femme
-                </label>
-
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="radio" name="genre" value="M"
-                           <?= (isset($old['genre']) && $old['genre'] === "M") ? "checked" : "" ?>
-                           class="radio radio-primary">
-                    Mixte
-                </label>
-            </div>
+                    <?php
+                    $genres = ["Homme", "Femme", "Mixte"];
+                    foreach ($genres as $g): ?>
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="genre" value="<?= $g ?>"
+                                <?= $participant['genre'] === $g ? 'checked' : '' ?> required>
+                            <?= $g ?>
+                        </label>
+                    <?php endforeach; ?>
+                </div>
         </div>
 
         <!-- Date de naissance -->
+        
+        <?php
+            $maxDate = date('Y-m-d', strtotime('-5 years'));
+        ?>
         <div class="form-control">
-    <label class="label">
-        <span class="label-text font-semibold">Date de naissance *</span>
-    </label>
-    <input type="date"
-           name="date_naissance"
-           class="input input-bordered"
-           required>
-</div>
+            <label class="font-semibold">Date de naissance *</label>
+            <input
+                type="date"
+                name="date_naissance"
+                class="input input-bordered w-full"
+                max="<?= $maxDate ?>"
+                value="<?= htmlspecialchars($_POST['date_naissance'] ?? $participant['date_naissance'] ?? '') ?>"
+                required
+            >
+
+        </div>
 
 
         <!-- Nationalité -->

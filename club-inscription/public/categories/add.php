@@ -5,15 +5,48 @@ require_once __DIR__ . '/../../include/header.php';
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $cle = trim($_POST['cle']);
     $nom = trim($_POST['nom']);
 
-    if ($nom === '') {
-        $errors[] = "Le nom de la course est obligatoire.";
+    if ($cle === '') {
+        $_SESSION['flash'] = [
+            'type' => 'error',
+            'message' => "La clé de la course est obligatoire."
+        ];
+        header("Location: add.php");
+        exit; 
     }
-
+    if ($nom === '') {
+      $_SESSION['flash'] = [
+          'type' => 'error',
+          'message' => "Le nom de la course est obligatoire."
+        ];
+        header("Location: add.php");
+        exit;
+    }
+    $stmr = $db->prepare("SELECT COUNT(*) FROM categories WHERE cle = ?");
+    $stmr->execute([$cle]);
+    if ($stmr->fetchColumn() > 0) {
+      $_SESSION['flash'] = [
+          'type' => 'error',
+          'message' => "Cette clé de course est déjà utilisée."
+        ];
+        header("Location: add.php");
+        exit;
+    }
+    $stmr = $db->prepare("SELECT COUNT(*) FROM categories WHERE cle = ?");
+    $stmr->execute([$cle]);
+    if ($stmr->fetchColumn() > 0) {
+      $_SESSION['flash'] = [
+          'type' => 'error',
+          'message' => "Cette clé de course est déjà utilisée."
+        ];
+        header("Location: add.php");
+        exit;
+    }
     if (!$errors) {
-        $stmt = $db->prepare("INSERT INTO categories (nom) VALUES (?)");
-        $stmt->execute([$nom]);
+        $stmt = $db->prepare("INSERT INTO categories (cle, nom) VALUES (?, ?)");
+        $stmt->execute([$cle, $nom]);
         
         $_SESSION['flash'] = ['type' => 'success', 'message' => "Course ajoutée avec succès !"];
         header("Location: list.php");
@@ -37,12 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <?php endif; ?>
 
   <form method="post" class="space-y-4">
+    <input name="cle" placeholder="clé unique (ex: esa_namur)"
+           class="input input-bordered w-full"
+           value="<?= htmlspecialchars($_POST['cle'] ?? '') ?>">
 
-    <div class="form-control">
-      <label class="label"><span class="label-text">Nom de la course</span></label>
-      <input type="text" name="nom" class="input input-bordered w-full" 
-             value="<?= htmlspecialchars($_POST['nom'] ?? '') ?>">
-    </div>
+    <input name="nom" placeholder="Nom affiché"
+           class="input input-bordered w-full"
+           value="<?= htmlspecialchars($_POST['nom'] ?? '') ?>">
+
 
     <div class="flex justify-end gap-3 pt-4">
       <a href="list.php" class="btn btn-neutral">Annuler</a>

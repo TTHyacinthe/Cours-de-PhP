@@ -4,12 +4,22 @@ require_once __DIR__ . '/../../include/header.php';
 
 $id = $_GET['id'] ?? null;
 
+if (!$id) {
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'message' => "Catégorie invalide."
+    ];
+    header('Location: list.php');
+    exit;
+}
+
+/* Récupération de la catégorie */
 $stmt = $db->prepare("SELECT * FROM categories WHERE id = ?");
 $stmt->execute([$id]);
 $cat = $stmt->fetch();
 
 if (!$cat) {
-    echo "<p class='text-error'>Course introuvable.</p>";
+    echo "<p class='text-error'>Catégorie introuvable.</p>";
     require_once __DIR__ . '/../../include/footer.php';
     exit;
 }
@@ -17,16 +27,38 @@ if (!$cat) {
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $nom = trim($_POST['nom']);
+    $cle = trim($_POST['cle'] ?? '');
+    $libelle = trim($_POST['nom'] ?? '');
 
-    if ($nom === '') {
+    if ($cle === '' || $libelle === '') {
+      $_SESSION['flash'] = [
+          'type' => 'error',
+          'message' => "Tous les champs sont obligatoires."
+        ];
+        header("Location: edit.php?id=" . $id);
+        exit;
+    }
+
+    /* Vérifier l'unicité de la clé */
+    $check = $db->prepare(
+        "SELECT id FROM categories WHERE cle = ? AND id != ?"
+    );
+    $check->execute([$cle, $id]);
+
+    if ($check->fetch()) {
         $_SESSION['flash'] = [
             'type' => 'error',
-            'message' => "Le nom de la course est obligatoire."
+            'message' => "Cette clé est déjà utilisée par une autre catégorie."
         ];
-    } else {
-        $stmt = $db->prepare("UPDATE categories SET nom = ? WHERE id = ?");
-        $stmt->execute([$nom, $id]);
+        header("Location: edit.php?id=" . $id);
+        exit;
+    }
+
+    if (!$errors) {
+        $stmt = $db->prepare(
+            "UPDATE categories SET cle = ?, nom = ? WHERE id = ?"
+        );
+        $stmt->execute([$cle, $libelle, $id]);
 
         $_SESSION['flash'] = [
             'type' => 'success',
@@ -37,35 +69,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 }
-
 ?>
 
 <div class="card bg-base-100 shadow-lg p-8 border border-base-300">
 
-  <h1 class="text-2xl font-bold mb-6">Modifier la course</h1>
 
-  <?php if ($errors): ?>
-    <div class="alert alert-error mb-4">
-      <?php foreach ($errors as $e): ?>
-        <p><?= htmlspecialchars($e) ?></p>
-      <?php endforeach; ?>
-    </div>
-  <?php endif; ?>
+    <form method="post" class="space-y-4">
 
-  <form method="post" class="space-y-4">
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Clé (identifiant unique)</span>
+            </label>
+            <input
+                type="text"
+                name="cle"
+                class="input input-bordered w-full"
+                value="<?= htmlspecialchars($_POST['cle'] ?? $cat['cle']) ?>"
+            >
+        </div>
 
-    <div class="form-control">
-      <label class="label"><span class="label-text">Nom</span></label>
-      <input type="text" name="nom" class="input input-bordered w-full" 
-             value="<?= htmlspecialchars($_POST['nom'] ?? $cat['nom']) ?>">
-    </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Libellé</span>
+            </label>
+            <input
+                type="text"
+                name="nom"
+                class="input input-bordered w-full"
+                value="<?= htmlspecialchars($_POST['nom'] ?? $cat['nom']) ?>"
+            >
+        </div>
 
-    <div class="flex justify-end gap-3 pt-4">
-      <a href="list.php" class="btn btn-neutral">Annuler</a>
-      <button class="btn btn-warning text-black">✏ Modifier</button>
-    </div>
+        <div class="flex justify-end gap-3 pt-4">
+            <a href="list.php" class="btn btn-neutral">Annuler</a>
+            <button class="btn btn-warning text-black">✏ Modifier</button>
+        </div>
 
-  </form>
+    </form>
 </div>
 
 <?php require_once __DIR__ . '/../../include/footer.php'; ?>

@@ -16,7 +16,8 @@ try {
     $db->exec("
         CREATE TABLE IF NOT EXISTS categories (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nom TEXT NOT NULL UNIQUE
+            cle TEXT NOT NULL UNIQUE,
+            nom TEXT NOT NULL
         );
     ");
 

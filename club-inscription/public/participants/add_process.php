@@ -43,18 +43,43 @@ if (
    Validation date
 ============================ */
 
-$dt = DateTime::createFromFormat('Y-m-d', $date_naissance);
+$dateNaissanceInput = $_POST['date_naissance'] ?? null;
 
-if (!$dt) {
+if (!$dateNaissanceInput) {
     $_SESSION['flash'] = [
         'type' => 'error',
-        'message' => "Date de naissance invalide."
+        'message' => "La date de naissance est obligatoire."
     ];
-    header('Location: add.php');
+    header("Location: add.php");
     exit;
 }
 
-$annee_naissance = (int)$dt->format('Y');
+$dateNaissance = DateTime::createFromFormat('Y-m-d', $dateNaissanceInput);
+
+if (!$dateNaissance) {
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'message' => "Format de date invalide."
+    ];
+    header("Location: add.php");
+    exit;
+}
+
+// Date limite = aujourd’hui - 5 ans
+$limite = new DateTime('-5 years');
+
+if ($dateNaissance > $limite) {
+    $_SESSION['flash'] = [
+        'type' => 'error',
+        'message' => "Le participant doit avoir au moins 5 ans."
+    ];
+    header("Location: add.php");
+    exit;
+}
+
+
+$dt = $dateNaissance->format('Y-m-d');
+$annee_naissance = (int)$dateNaissance->format('Y');
 
 /* ============================
    Insertion en base
@@ -89,7 +114,7 @@ try {
         ':nom'             => $nom,
         ':prenom'          => $prenom,
         ':genre'           => $genre,
-        ':date_naissance'  => $date_naissance,
+        ':date_naissance'  => $dt,
         ':annee_naissance' => $annee_naissance,
         ':categorie_id'    => $categorie_id,
         ':club'            => $club !== '' ? $club : null,
